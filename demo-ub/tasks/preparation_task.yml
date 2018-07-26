@@ -1,0 +1,42 @@
+- name: Create custom Nginx configuration directory
+  file:
+    path: /etc/nginx/custom
+    state: directory
+  become: yes
+
+- name: Create Nginx logs directory
+  file:
+    path: /sepulsa/logs/nginx
+    state: directory
+  become: yes
+
+- name: Create Nginx logs directory
+  file:
+    path: /sepulsa/certs
+    state: directory
+  become: yes
+
+- name: Create custom document root directory
+  file:
+    path: /sepulsa/www/{{ project_name }}
+    owner: ubuntu
+    group: ubuntu
+    state: directory
+  become: yes
+ 
+- name: Copy dhparam key
+  template: 
+    src: files/dhparam.pem 
+    dest: /sepulsa/certs/ 
+    owner: root
+    group: root 
+    mode: 0644
+  become: yes
+
+- name: Copy sample index file
+  template:
+    src: files/index.html
+    dest: /sepulsa/www/{{ project_name }}/
+    owner: ubuntu
+    group: ubuntu
+  become: yes

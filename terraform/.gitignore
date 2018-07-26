@@ -1,0 +1,8 @@
+.terraform
+modules/*
+certs/*
+crash.log
+ssh-keys/*
+terraform.tfstate
+terraform.tfstate.backup
+variables.tf

@@ -1,0 +1,31 @@
+server {
+    listen 80;
+    server_name {{ nginx_server_name }} {{ nginx_alt_server_name }} ;
+
+    root {{ nginx_docroot_path }};
+    index {{ nginx_index }};
+
+    ## Access and error logs.
+    access_log /sepulsa/logs/nginx/{{ nginx_server_name }}_access.log;
+    error_log /sepulsa/logs/nginx/{{ nginx_server_name }}_error.log;
+
+    location @rewrite {
+        rewrite ^/(.*)$ /index.html last;
+    }
+
+    location / {
+       try_files $uri @rewrite;
+    }
+
+    location /components/ {
+	deny all;
+    }
+
+    location ~ (^|/)\. {
+        return 403;
+    }
+
+    ## Block unwanted bot-bot
+    include custom/blockbot.conf;
+
+} # HTTPS server

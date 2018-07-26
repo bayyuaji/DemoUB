@@ -1,0 +1,9 @@
+---
+ - hosts: localhost
+   connection: local
+   gather_facts: false
+   user: root
+   pre_tasks:
+    - include_vars: vars/sample.yml
+   roles:
+    - provision-ec2 

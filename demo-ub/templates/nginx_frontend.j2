@@ -1,0 +1,79 @@
+user  www-data;
+worker_processes  auto;
+worker_rlimit_nofile 100000;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+        worker_connections  1024;
+        use epoll;
+        multi_accept on;
+}
+
+http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                              '$status $body_bytes_sent "$http_referer" '
+                              '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log off;
+        #error_log /var/log/nginx/error.log crit;
+
+        ################################
+        #best performance configuration#
+        ################################
+        # copies data between one FD and other from within the kernel
+        # faster then read() + write()
+        sendfile        on;
+        # send headers in one peace, its better then sending them one by one
+        tcp_nopush      on;
+        # don't buffer data sent, good for small data bursts in real time
+        tcp_nodelay     on;
+        # allow the server to close connection on non responding client, this will free up memory
+        reset_timedout_connection on;
+        # request timed out -- default 60
+        client_body_timeout 30;
+        # if client stop responding, free up memory -- default 60
+        send_timeout 30;
+        # server will close connection after this time -- default 75
+        keepalive_timeout 65;
+	# number of requests client can make over keep-alive -- for testing environment
+        keepalive_requests 100000;
+        # buffer size tweak
+        client_body_buffer_size      128k;
+        client_max_body_size         25m;
+        client_header_buffer_size    1k;
+        large_client_header_buffers  4 4k;
+        output_buffers               1 32k;
+        postpone_output              1460;
+
+        # gzipping content
+        gzip on;
+        gzip_min_length 1000;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/json application/xml;
+        gzip_disable "MSIE [1-6]\.";
+
+        ####################
+        #security hardening#
+        ####################
+        # hide nginx version
+        server_tokens off;
+        # config to don't allow the browser to render the page inside a frame or iframe
+        add_header X-Frame-Options SAMEORIGIN;
+        # to disable content-type sniffing on some browsers.
+        add_header X-Content-Type-Options nosniff;
+        # Enables the Cross-site scripting (XSS) filter
+        add_header X-XSS-Protection "1; mode=block";
+        # enable HTST to avoid SSL stripping
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains;";
+        # strength cipher suites
+        ssl_prefer_server_ciphers on;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+
+        #include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*.conf;
+}

@@ -1,0 +1,10 @@
+- hosts: demoub
+  become: ubuntu
+  gather_facts: false
+  vars_files:
+    - 'vars.yml'
+  tasks:
+    - name: install python 2
+      raw: test -e /usr/bin/python || (sudo apt -y update && sudo apt install -y python-minimal)
+    - include: 'tasks/preparation_task.yml'
+    - include: 'tasks/install_nginx.yml'

@@ -1,0 +1,11 @@
+# used for document root name and subdomain
+project_name: "demo"
+# server name
+nginx_server_name: "demo.sumpahpalapa.com"
+# alternate server name
+nginx_alt_server_name: ""
+# document root
+nginx_docroot_path: "/sepulsa/www/{{ project_name }}"
+# index that served by nginx
+nginx_index: "index.html index.htm"
+

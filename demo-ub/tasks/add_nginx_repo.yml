@@ -1,0 +1,12 @@
+- name: Add Nginx repository key to the system
+  apt_key: url=http://nginx.org/keys/nginx_signing.key state=present 
+- name: Add Nginx repository
+  apt_repository: >
+    repo='deb http://nginx.org/packages/debian/ {{ distro }} nginx'
+    state=present
+- name: Add Nginx repository (src)
+  apt_repository: >
+    repo='deb-src http://nginx.org/packages/debian/ {{ distro }} nginx'
+    state=present
+    update_cache=yes
+
